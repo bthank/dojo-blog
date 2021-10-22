@@ -10,13 +10,17 @@ const Home = () => {
    //      { title: 'Web dev top tips', body: 'lorem ipsum...', author: 'mario', id: 3 }
    //  ]);
 
+    // initially set blogs to null and then have useEffect load blogs on the
+    // first render with data coming from json server 
+    const[blogs, setBlogs] = useState(null);
+
     const [name, setName] = useState('Mario');
 
-    const handleDelete = (id) => {
+    /* const handleDelete = (id) => {
         const newBlogs = blogs.filter(blog => blog.id !== id);
         setBlogs(newBlogs);
     };
-
+    */
  
 
     // the useEffect hook executes on every render or re-render
@@ -34,13 +38,28 @@ const Home = () => {
     //           it changes will it run the useEffect function     
     useEffect(() => {
         console.log('useEffect ran');
+        fetch('http://localhost:8000/blogs')  // this is a promise that needs to resolve
+            .then(response => {   // the response object is not the data.  We need to do something to get the data from the response object.
+                return response.json()  // the json method gets the data from the response object in json format, but this also needs time to resolve
+            })
+            .then((data) => {          // add the 2nd then to execute after the prior then resolved so we can be sure we got the response data at this point 
+                console.log('data: ',data);
+                setBlogs(data);
+              
+            })
+            .then((blogData) => {
+                console.log('blogData: ',blogData);
+            })
     },[]);
 
     return ( 
         <div className="home">
-            <BlogList blogs={blogs} title="All Blogs!" handleDelete={handleDelete}/>
-            <button onClick={() => setName('Luigi')}>Change name</button>
+           
+            {blogs && <BlogList blogs={blogs} title="All Blogs!" />}
+         
+        {/*}    <button onClick={() => setName('Luigi')}>Change name</button>
             <p>{ name }</p>
+        */}
        </div>
      );
 }
