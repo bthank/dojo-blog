@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import BlogList from "./BlogList";
+import useFetch from "./useFetch";
 
 const Home = () => {
 
@@ -12,9 +13,9 @@ const Home = () => {
 
     // initially set blogs to null and then have useEffect load blogs on the
     // first render with data coming from json server 
-    const[blogs, setBlogs] = useState(null);
 
-    const [name, setName] = useState('Mario');
+    // const [name, setName] = useState('Mario');
+
 
     /* const handleDelete = (id) => {
         const newBlogs = blogs.filter(blog => blog.id !== id);
@@ -36,26 +37,16 @@ const Home = () => {
     //       the useEffect function to run when they change   
     //         - useEffect will watch the value in the dependency array and only if
     //           it changes will it run the useEffect function     
-    useEffect(() => {
-        console.log('useEffect ran');
-        fetch('http://localhost:8000/blogs')  // this is a promise that needs to resolve
-            .then(response => {   // the response object is not the data.  We need to do something to get the data from the response object.
-                return response.json()  // the json method gets the data from the response object in json format, but this also needs time to resolve
-            })
-            .then((data) => {          // add the 2nd then to execute after the prior then resolved so we can be sure we got the response data at this point 
-                console.log('data: ',data);
-                setBlogs(data);
-              
-            })
-            .then((blogData) => {
-                console.log('blogData: ',blogData);
-            })
-    },[]);
+
+    const { data: blogs, isPending, error } = useFetch('http://localhost:8000/blogs');
 
     return ( 
         <div className="home">
-           
-            {blogs && <BlogList blogs={blogs} title="All Blogs!" />}
+            {error && <div>{error}</div>}
+            {isPending && <div>Loading ...</div>}
+            { // this is called a conditional template where the code on the
+              // right of the && will only execute if the conditional on the left is true
+                blogs && <BlogList blogs={blogs} title="All Blogs!" />}
          
         {/*}    <button onClick={() => setName('Luigi')}>Change name</button>
             <p>{ name }</p>
